@@ -1,0 +1,1 @@
+Pinterest Campaign Report long description
