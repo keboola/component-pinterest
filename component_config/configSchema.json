@@ -1,19 +1,12 @@
 {
   "type": "object",
-  "title": "extractor configuration",
-  "required": [
-    "print_hello"
-  ],
+  "title": "Extractor configuration",
   "properties": {
-    "print_hello": {
-      "type": "boolean",
-      "title": "Print Hello",
-      "propertyOrder": 1
-    },
-    "debug": {
-      "type": "boolean",
-      "title": "Debug",
-      "propertyOrder": 2
+    "#api_token": {
+        "type": "string",
+        "title": "API token",
+        "format": "password",
+        "propertyOrder": 1
     }
   }
 }

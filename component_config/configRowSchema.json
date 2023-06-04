@@ -1,1 +1,311 @@
-{}
+{
+  "title": "Pinterest Report",
+  "type": "object",
+  "required": [
+    "input_variant",
+    "time_range",
+    "destination"
+  ],
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "title": "Accounts",
+      "propertyOrder": 50,
+      "description": "Select accounts to be reported",
+      "items": {
+        "type": "string",
+        "enum": [],
+        "minLength": 1,
+        "title": "Accounts"
+      },
+      "format": "select",
+      "uniqueItems": true,
+      "options": {
+        "async": {
+          "label": "Load avaiable accounts",
+          "action": "load_accounts"
+        }
+      }
+    },
+    "input_variant": {
+      "type": "string",
+      "title": "Specification variant",
+      "propertyOrder": 100,
+      "description": "You may choose to either define a report or to use existing report templates",
+      "enum": [
+        "report_specification",
+        "existing_report_ids"
+      ],
+      "options": {
+        "enum_titles": [
+          "Report specification",
+          "Existing report template ID(s)"
+        ]
+      },
+      "default": "report_specification"
+    },
+    "time_range": {
+      "type": "object",
+      "title": "Time Range",
+      "propertyOrder": 200,
+      "properties": {
+        "date_from": {
+          "type": "string",
+          "title": "Date from",
+          "propertyOrder": 20,
+          "description": "Start date: Either date in YYYY-MM-DD format or a relative date string i.e. 5 days ago, 1 month ago, yesterday, etc."
+        },
+        "date_to": {
+          "type": "string",
+          "title": "Date to",
+          "propertyOrder": 30,
+          "description": "End date: Either date in YYYY-MM-DD format or a relative date string i.e. 5 days ago, 1 month ago, yesterday, etc."
+        },
+        "granularity": {
+          "type": "string",
+          "title": "Granularity",
+          "propertyOrder": 40,
+          "description": "Time aggregation",
+          "enum": [
+            "TOTAL",
+            "DAY",
+            "HOUR",
+            "WEEK",
+            "MONTH"
+          ],
+          "options": {
+            "enum_titles": [
+              "Total",
+              "Day",
+              "Hour",
+              "Week",
+              "Month"
+            ]
+          }
+        }
+      }
+    },
+    "report_specification": {
+      "type": "object",
+      "title": "Report Details",
+      "propertyOrder": 300,
+      "properties": {
+        "columns": {
+          "title": "Columns",
+          "type": "string",
+          "enum": [
+            "SPEND_IN_MICRO_DOLLAR",
+            "PAID_IMPRESSION",
+            "SPEND_IN_DOLLAR",
+            "CPC_IN_MICRO_DOLLAR",
+            "ECPC_IN_MICRO_DOLLAR",
+            "ECPC_IN_DOLLAR",
+            "CTR"
+          ],
+          "propertyOrder": 500
+        },
+        "level": {
+          "title": "Level",
+          "type": "string",
+          "enum": [
+            "ADVERTISER",
+            "ADVERTISER_TARGETING",
+            "CAMPAIGN",
+            "CAMPAIGN_TARGETING",
+            "AD_GROUP",
+            "AD_GROUP_TARGETING",
+            "PIN_PROMOTION",
+            "PIN_PROMOTION_TARGETING",
+            "KEYWORD",
+            "PRODUCT_GROUP",
+            "PRODUCT_GROUP_TARGETING",
+            "PRODUCT_ITEM"
+          ],
+          "propertyOrder": 510
+        },
+        "click_window_days": {
+          "title": "Click Window Days",
+          "type": "string",
+          "default": "30",
+          "enum": [
+            "0",
+            "1",
+            "7",
+            "14",
+            "30",
+            "60"
+          ],
+          "propertyOrder": 520
+        },
+        "engagement_window_days": {
+          "title": "Engagement Window Days",
+          "type": "string",
+          "default": "30",
+          "enum": [
+            "0",
+            "1",
+            "7",
+            "14",
+            "30",
+            "60"
+          ],
+          "propertyOrder": 530
+        },
+        "view_window_days": {
+          "title": "View Window Days",
+          "type": "string",
+          "default": "1",
+          "enum": [
+            "0",
+            "1",
+            "7",
+            "14",
+            "30",
+            "60"
+          ],
+          "propertyOrder": 540
+        },
+        "conversion_report_time": {
+          "title": "Conversion Report Time",
+          "type": "string",
+          "default": "TIME_OF_AD_ACTION",
+          "enum": [
+            "TIME_OF_AD_ACTION",
+            "TIME_OF_CONVERSION"
+          ],
+          "propertyOrder": 540
+        }
+      },
+      "options": {
+        "dependencies": {
+          "input_variant": "report_specification"
+        }
+      }
+    },
+    "existing_report_ids": {
+      "type": "array",
+      "title": "Report ID(s) to be run in parallel",
+      "propertyOrder": 400,
+      "minLength": 1,
+      "description": "Select reports that will run in parallel",
+      "format": "select",
+      "uniqueItems": true,
+      "items": {
+        "title": "Report ID",
+        "type": "string",
+        "enum": [],
+        "minLength": 1
+      },
+      "options": {
+        "dependencies": {
+          "input_variant": "existing_report_ids"
+        },
+        "async": {
+          "label": "Load available reports",
+          "action": "load_reports"
+        }
+      }
+    },
+    "destination": {
+      "type": "object",
+      "title": "Destination",
+      "propertyOrder": 600,
+      "required": [
+        "table_name",
+        "incremental_loading"
+      ],
+      "properties": {
+        "selected_variant": {
+          "type": "string",
+          "title": "Selected variant",
+          "description": "Helper dummy element to render pkeys",
+          "template": "{{var}}",
+          "watch": {
+            "var": "input_variant"
+          },
+          "options": {
+            "hidden": true
+          }
+        },
+        "table_name": {
+          "type": "string",
+          "title": "Storage Table Name",
+          "propertyOrder": 10,
+          "minLength": 1,
+          "description": "Name of the destination table for this report. (e.g. standard_performance_data)."
+        },
+        "primary_key": {
+          "type": "array",
+          "title": "Primary Key",
+          "description": "List of columns (from selected dimensions) to be used as primary key of the resulting table. We recommend using ID columns where possible, to avoid ambiguity in case the dimension name is changed.",
+          "propertyOrder": 20,
+          "format": "select",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "watch": {
+              "dim": "report_specification.dimensions"
+            },
+            "enumSource": "dim"
+          },
+          "options": {
+            "dependencies": {
+              "selected_variant": "report_specification"
+            }
+          }
+        },
+        "primary_key_existing": {
+          "type": "array",
+          "title": "Primary Key",
+          "description": "List of columns (load from report) to be used as primary key of the resulting table. We recommend using ID columns where possible, to avoid ambiguity in case the dimension name is changed.",
+          "propertyOrder": 21,
+          "format": "select",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [],
+            "minLength": 1,
+            "title": "Dimension"
+          },
+          "options": {
+            "async": {
+              "label": "Load available dimensions",
+              "action": "list_report_dimensions"
+            },
+            "dependencies": {
+              "selected_variant": [
+                "report_template_id",
+                "existing_report_ids"
+              ]
+            }
+          }
+        },
+        "incremental_loading": {
+          "enum": [
+            false,
+            true
+          ],
+          "type": "boolean",
+          "title": "Load Type",
+          "default": true,
+          "options": {
+            "enum_titles": [
+              "Full Load",
+              "Incremental Load"
+            ]
+          },
+          "description": "If Full load is used, the destination table will be overwritten every run. If Incremental Load is used, data will be upserted into the destination table.",
+          "propertyOrder": 30
+        }
+      }
+    },
+    "debug": {
+      "type": "boolean",
+      "propertyOrder": 700,
+      "title": "Debug",
+      "hidden": true,
+      "description": "When checked, logging will be more verbose",
+      "format": "checkbox"
+    }
+  }
+}
