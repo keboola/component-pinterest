@@ -6,17 +6,11 @@ import csv
 import logging
 from datetime import datetime
 
-from keboola.component.base import ComponentBase
+from keboola.component.base import ComponentBase, sync_action
 from keboola.component.exceptions import UserException
+from keboola.component.sync_actions import SelectElement
 
-# configuration variables
-KEY_API_TOKEN = '#api_token'
-KEY_PRINT_HELLO = 'print_hello'
-
-# list of mandatory parameters => if some is missing,
-# component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_PRINT_HELLO]
-REQUIRED_IMAGE_PARS = []
+from Pinterest.client import PinterestClient
 
 
 class Component(ComponentBase):
@@ -32,20 +26,15 @@ class Component(ComponentBase):
 
     def __init__(self):
         super().__init__()
+        # self.cfg: Configuration
+        self.pinterest_client: PinterestClient
 
     def run(self):
         """
         Main execution code
         """
 
-        # ####### EXAMPLE TO REMOVE
-        # check for missing configuration parameters
-        self.validate_configuration_parameters(REQUIRED_PARAMETERS)
-        self.validate_image_parameters(REQUIRED_IMAGE_PARS)
-        params = self.configuration.parameters
-        # Access parameters in data/config.json
-        if params.get(KEY_PRINT_HELLO):
-            logging.info("Hello World")
+        # params = self.configuration.parameters
 
         # get last state data/in/state.json from previous run
         previous_state = self.get_state_file()
@@ -71,6 +60,18 @@ class Component(ComponentBase):
         self.write_state_file({"some_state_parameter": "value"})
 
         # ####### EXAMPLE TO REMOVE END
+
+    @sync_action('load_accounts')
+    def load_accounts(self):
+        self._init_pinterest_client()
+        accounts = self.pinterest_client.get_accounts()
+        result = [SelectElement(value=acc['id'], label=f"{acc['name']} ({acc['id']})") for acc in accounts]
+        return result
+
+    def _init_pinterest_client(self):
+        api_token = self.configuration.parameters.get('#api_token')
+        client = PinterestClient(api_token)
+        self.pinterest_client = client
 
 
 """
