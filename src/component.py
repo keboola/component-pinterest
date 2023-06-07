@@ -68,6 +68,12 @@ class Component(ComponentBase):
         result = [SelectElement(value=acc['id'], label=f"{acc['name']} ({acc['id']})") for acc in accounts]
         return result
 
+    @sync_action('list_report_columns')
+    def list_report_columns(self):
+        # TODO: This is just a demo
+        result = [SelectElement(value=col['id']) for col in [{'id': 'Column1'}, {'id': 'Column2'}, {'id': 'Column3'}]]
+        return result
+
     def _init_pinterest_client(self):
         api_token = self.configuration.parameters.get('#api_token')
         client = PinterestClient(api_token)

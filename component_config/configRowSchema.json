@@ -92,16 +92,22 @@
       "properties": {
         "columns": {
           "title": "Columns",
-          "type": "string",
-          "enum": [
-            "SPEND_IN_MICRO_DOLLAR",
-            "PAID_IMPRESSION",
-            "SPEND_IN_DOLLAR",
-            "CPC_IN_MICRO_DOLLAR",
-            "ECPC_IN_MICRO_DOLLAR",
-            "ECPC_IN_DOLLAR",
-            "CTR"
-          ],
+          "type": "array",
+          "description": "Select reported columns",
+          "format": "select",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "SPEND_IN_MICRO_DOLLAR",
+              "PAID_IMPRESSION",
+              "SPEND_IN_DOLLAR",
+              "CPC_IN_MICRO_DOLLAR",
+              "ECPC_IN_MICRO_DOLLAR",
+              "ECPC_IN_DOLLAR",
+              "CTR"
+            ]
+          },
           "propertyOrder": 500
         },
         "level": {
@@ -187,7 +193,7 @@
       "title": "Report ID(s) to be run in parallel",
       "propertyOrder": 400,
       "minLength": 1,
-      "description": "Select reports that will run in parallel",
+      "description": "Select report templates that will run in parallel",
       "format": "select",
       "uniqueItems": true,
       "items": {
@@ -244,7 +250,7 @@
           "items": {
             "type": "string",
             "watch": {
-              "dim": "report_specification.dimensions"
+              "dim": "report_specification.columns"
             },
             "enumSource": "dim"
           },
@@ -265,12 +271,12 @@
             "type": "string",
             "enum": [],
             "minLength": 1,
-            "title": "Dimension"
+            "title": "Columns"
           },
           "options": {
             "async": {
-              "label": "Load available dimensions",
-              "action": "list_report_dimensions"
+              "label": "Load available columns",
+              "action": "list_report_columns"
             },
             "dependencies": {
               "selected_variant": [
