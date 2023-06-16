@@ -74,6 +74,10 @@ class Component(ComponentBase):
         result = [SelectElement(value=acc['id'], label=f"{acc['name']} ({acc['id']})") for acc in accounts]
         return result
 
+    @sync_action('list_templates')
+    def list_templates(self):
+        seznam = self.client.get_templates()
+        pass
 
     @sync_action('test_debug')
     def list_report_columns(self):
@@ -89,8 +93,6 @@ class Component(ComponentBase):
             "level": "CAMPAIGN",
             "report_format": "JSON"
         }
-
-        clie
 
         result = [SelectElement(value=col['id']) for col in [{'id': 'Column1'}, {'id': 'Column2'}, {'id': 'Column3'}]]
         return result

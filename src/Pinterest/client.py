@@ -37,6 +37,21 @@ class PinterestClient:
                 break
         return total
 
+    def get_templates(self, account_id):
+        request_params = {'page_size': 2}
+        ep = f'ad_accounts/{account_id}/templates'
+        total = []
+        while True:
+            response = self.client.get(ep)
+            items = response.get('items')
+            total.extend(items)
+            bookmark = response.get('bookmark')
+            if bookmark:
+                request_params['bookmark'] = bookmark
+            else:
+                break
+        return total
+
     def create_request(self, account_id, body):
         ep = f'ad_accounts/{account_id}/reports'
         response = self.client.post(ep, json=body)
@@ -70,8 +85,9 @@ if __name__ == '__main__':
 
     client = PinterestClient(TOKEN)
     # response = client.create_request('549765938918', body)
+    response = client.get_templates('549765938918')
 
-    report_token = "aicYIR-uD7NJ_rphdEHgGA==PFT4JVYEPSigoMZ54AMtCJ_twkY6uPCI8nS3A5dSG3ZnW5lhR04oEOUbJl2Us4si3pnWNQmkmoEkNy_JciMmWVP97dnxmjznfHYnpOIEmSuS-7Ny_Gsg10KeluI_bEyRlCtYczuzjNTjQO-j7_NhMiJ2Ym1kNrDpzG80PYAax7d6U7A5r0aRw_G28bqnFeGeXe4cGLWMf2z8jZKIbHcF1oOA8JwA3tGvtPBt2FSGIQzVV4ZSvaK0diSeUV0qoow4vq3lM3sw98q3a2nz9aT0GsIn4kEFmRSA1q4mikxoxe6eBBeYM5iCSeK3Jansa4HmK05SaPRvfKv4Bs2YOzQ0vuoCOqvH-pI7h-ohar6-BKbJlcvIcNgClIte03JGq-L-ZG4KgA03b3ZTY-08j29lRaJv_hjUT47BVvZ7RctoKTQ="
-    response = client.read_report('549765938918', report_token)
+    # report_token = "aicYIR-uD7NJ_rphdEHgGA==PFT4JVYEPSigoMZ54AMtCJ_twkY6uPCI8nS3A5dSG3ZnW5lhR04oEOUbJl2Us4si3pnWNQmkmoEkNy_JciMmWVP97dnxmjznfHYnpOIEmSuS-7Ny_Gsg10KeluI_bEyRlCtYczuzjNTjQO-j7_NhMiJ2Ym1kNrDpzG80PYAax7d6U7A5r0aRw_G28bqnFeGeXe4cGLWMf2z8jZKIbHcF1oOA8JwA3tGvtPBt2FSGIQzVV4ZSvaK0diSeUV0qoow4vq3lM3sw98q3a2nz9aT0GsIn4kEFmRSA1q4mikxoxe6eBBeYM5iCSeK3Jansa4HmK05SaPRvfKv4Bs2YOzQ0vuoCOqvH-pI7h-ohar6-BKbJlcvIcNgClIte03JGq-L-ZG4KgA03b3ZTY-08j29lRaJv_hjUT47BVvZ7RctoKTQ="
+    # response = client.read_report('549765938918', report_token)
 
     pass
