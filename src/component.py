@@ -6,7 +6,6 @@ import os
 import csv
 import logging
 import time
-from datetime import datetime
 
 import requests
 from keboola.component.base import ComponentBase, sync_action
@@ -93,10 +92,6 @@ class Component(ComponentBase):
         params = self.configuration.parameters
         self.cfg = Configuration.fromDict(parameters=params)
 
-        # get last state data/in/state.json from previous run
-        # previous_state = self.get_state_file()
-        # logging.info(previous_state.get('some_state_parameter'))
-
         started_reports = []
 
         if self.cfg.input_variant == 'report_specification':
@@ -148,19 +143,7 @@ class Component(ComponentBase):
 
         self.combine_output_files(out_table_path, started_reports)
 
-        # DO whatever and save into out_table_path
-        # with open(table.full_path, mode='wt', encoding='utf-8', newline='') as out_file:
-        #     writer = csv.DictWriter(out_file, fieldnames=['timestamp'])
-        #     writer.writeheader()
-        #     writer.writerow({"timestamp": datetime.now().isoformat()})
-
-        # Save table manifest (output.csv.manifest) from the tabledefinition
         self.write_manifest(table)
-
-        # Write new state - will be available next run
-        # self.write_state_file({"some_state_parameter": "value"})
-
-        # ####### EXAMPLE TO REMOVE END
 
     def check_output_files(self, file_descriptors: list) -> tuple:
         header = None
@@ -211,24 +194,12 @@ class Component(ComponentBase):
         for account_id in self.configuration.parameters.get('accounts'):
             account_templates = self.client.get_templates(account_id=account_id)
             all_templates.extend(account_templates)
-        return all_templates
 
-    @sync_action('test_debug')
-    def list_report_columns(self):
-        # TODO: This is just a demo
-
-        body = {
-            "start_date": "2020-12-20",
-            "end_date": "2020-12-20",
-            "granularity": "TOTAL",
-            "columns": [
-                "CAMPAIGN_NAME", "SPEND_IN_MICRO_DOLLAR"
-            ],
-            "level": "CAMPAIGN",
-            "report_format": "JSON"
-        }
-
-        result = [SelectElement(value=col['id']) for col in [{'id': 'Column1'}, {'id': 'Column2'}, {'id': 'Column3'}]]
+        result = [SelectElement(
+            value=f'{templ["ad_account_id"]}:{templ["id"]}',
+            label=f'{templ["name"]} ({templ["ad_account_id"]}:{templ["id"]})')
+            for templ in all_templates
+        ]
         return result
 
 
@@ -238,13 +209,6 @@ class Component(ComponentBase):
 if __name__ == "__main__":
     try:
         comp = Component()
-
-        out_dir = 'C:\\Users\\DK\\Revolt\\Projects\\kds-team.ex-pinterest\\data\\out\\tables\\fds'
-        of = {
-            '549765938918': 'C:\\Users\\DK\\Revolt\\Projects\\kds-team.ex-pinterest\\data\\out\\files\\549765938918.raw.csv'
-        }
-        # comp.combine_output_files(out_dir, of)
-
         # this triggers the run method by default and is controlled by the configuration.action parameter
         comp.execute_action()
     except UserException as exc:

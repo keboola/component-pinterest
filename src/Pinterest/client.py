@@ -62,7 +62,6 @@ class PinterestClient:
         response = self.client.post(ep, json=time_range)
         return response
 
-
     def read_report(self, account_id, token):
         """
         response:
@@ -73,27 +72,3 @@ class PinterestClient:
         request_params = {'token': token}
         response = self.client.get(ep, params=request_params)
         return response
-
-
-if __name__ == '__main__':
-    TOKEN = 'pina_AEA5FJQWAATGQAQAGDAJODLWPKHK5CABACGSOWK2SH6L5HANXBIT7FOUTVETMSUT7KUY7SA36HAQGWG4NRQZYC3I7QBXRPYA'
-
-    body = {
-        "start_date": "2020-12-20",
-        "end_date": "2020-12-20",
-        "granularity": "TOTAL",
-        "columns": [
-            "CAMPAIGN_NAME", "SPEND_IN_MICRO_DOLLAR"
-        ],
-        "level": "CAMPAIGN",
-        "report_format": "CSV"
-    }
-
-    client = PinterestClient(TOKEN)
-    # response = client.create_request('549765938918', body)
-    response = client.get_templates('549765938918')
-
-    # report_token = "aicYIR-uD7NJ_rphdEHgGA==PFT4JVYEPSigoMZ54AMtCJ_twkY6uPCI8nS3A5dSG3ZnW5lhR04oEOUbJl2Us4si3pnWNQmkmoEkNy_JciMmWVP97dnxmjznfHYnpOIEmSuS-7Ny_Gsg10KeluI_bEyRlCtYczuzjNTjQO-j7_NhMiJ2Ym1kNrDpzG80PYAax7d6U7A5r0aRw_G28bqnFeGeXe4cGLWMf2z8jZKIbHcF1oOA8JwA3tGvtPBt2FSGIQzVV4ZSvaK0diSeUV0qoow4vq3lM3sw98q3a2nz9aT0GsIn4kEFmRSA1q4mikxoxe6eBBeYM5iCSeK3Jansa4HmK05SaPRvfKv4Bs2YOzQ0vuoCOqvH-pI7h-ohar6-BKbJlcvIcNgClIte03JGq-L-ZG4KgA03b3ZTY-08j29lRaJv_hjUT47BVvZ7RctoKTQ="
-    # response = client.read_report('549765938918', report_token)
-
-    pass

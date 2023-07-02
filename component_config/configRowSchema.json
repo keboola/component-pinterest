@@ -240,52 +240,6 @@
           "minLength": 1,
           "description": "Name of the destination table for this report. (e.g. standard_performance_data)."
         },
-        "primary_key": {
-          "type": "array",
-          "title": "Primary Key",
-          "description": "List of columns (from selected dimensions) to be used as primary key of the resulting table. We recommend using ID columns where possible, to avoid ambiguity in case the dimension name is changed.",
-          "propertyOrder": 20,
-          "format": "select",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "watch": {
-              "dim": "report_specification.columns"
-            },
-            "enumSource": "dim"
-          },
-          "options": {
-            "dependencies": {
-              "selected_variant": "report_specification"
-            }
-          }
-        },
-        "primary_key_existing": {
-          "type": "array",
-          "title": "Primary Key",
-          "description": "List of columns (load from report) to be used as primary key of the resulting table. We recommend using ID columns where possible, to avoid ambiguity in case the dimension name is changed.",
-          "propertyOrder": 21,
-          "format": "select",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "enum": [],
-            "minLength": 1,
-            "title": "Columns"
-          },
-          "options": {
-            "async": {
-              "label": "Load available columns",
-              "action": "list_report_columns"
-            },
-            "dependencies": {
-              "selected_variant": [
-                "report_template_id",
-                "existing_report_ids"
-              ]
-            }
-          }
-        },
         "incremental_loading": {
           "enum": [
             false,

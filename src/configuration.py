@@ -62,8 +62,6 @@ class ConversionReportTimeEnum(Enum):
 class Destination:
     table_name: str
     incremental_loading: bool = True
-    primary_key: list[str] = None
-    primary_key_existing: list[str] = None
 
 
 @dataclass
@@ -100,37 +98,3 @@ class Configuration(ConfigurationBase):
     report_specification: ReportSettings = field(default_factory=lambda: ConfigTree({}))
     existing_report_ids: list[str] = field(default_factory=lambda: ConfigTree({}))
     debug: bool = False
-
-
-if __name__ == '__main__':
-    json_conf_1 = """
-    {
-    "#api_token": "pina_AEA5FJQWAATGQAQAGDAJODLWPKHK5CABACGSOWK2SH6L5HANXBIT7FOUTVETMSUT7KUY7SA36HAQGWG4NRQZYC3I7QBXRPYA",
-    "debug": false,
-    "accounts": ["jedna", "dve", "tri"],
-    "time_range": {
-      "date_to": "today - 5",
-      "date_from": "today",
-      "granularity": "HOUR"
-    },
-    "destination": {
-      "table_name": "fds",
-      "primary_key": [],
-      "selected_variant": "report_specification",
-      "incremental_loading": true
-    },
-    "input_variant": "report_specification",
-    "report_specification": {
-      "level": "CAMPAIGN_TARGETING",
-      "columns": ["CAMPAIGN_NAME", "SPEND_IN_DOLLAR"],
-      "view_window_days": "1",
-      "click_window_days": "30",
-      "conversion_report_time": "TIME_OF_AD_ACTION",
-      "engagement_window_days": "30"
-    }
-  }
-    """
-
-    cf1 = dataconf.loads(json_conf_1, Configuration, ignore_unexpected=True)
-
-    pass
