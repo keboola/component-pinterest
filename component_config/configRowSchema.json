@@ -221,18 +221,6 @@
         "incremental_loading"
       ],
       "properties": {
-        "selected_variant": {
-          "type": "string",
-          "title": "Selected variant",
-          "description": "Helper dummy element to render pkeys",
-          "template": "{{var}}",
-          "watch": {
-            "var": "input_variant"
-          },
-          "options": {
-            "hidden": true
-          }
-        },
         "table_name": {
           "type": "string",
           "title": "Storage Table Name",

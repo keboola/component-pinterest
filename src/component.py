@@ -56,10 +56,6 @@ class Component(ComponentBase):
                 'columns': self.cfg.report_specification.columns,
                 'level': self.cfg.report_specification.level.value,
                 'report_format': 'CSV'}
-        # body['click_window_days'] = int(body['click_window_days'])
-        # body['engagement_window_days'] = int(body['engagement_window_days'])
-        # body['view_window_days'] = int(body['view_window_days'])
-        # body['report_format'] = 'CSV'
         return body
 
     def _prepare_time_range_body(self):
@@ -129,8 +125,8 @@ class Component(ComponentBase):
                 time.sleep(10)
 
         keys, columns = self.check_output_files(started_reports)
-        keys.insert(0, 'Account ID')
-        columns.insert(0, 'Account ID')
+        keys.insert(0, 'Account_ID')
+        columns.insert(0, 'Account_ID')
 
         table = self.create_out_table_definition(self.cfg.destination.table_name,
                                                  incremental=self.cfg.destination.incremental_loading,
