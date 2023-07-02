@@ -57,6 +57,12 @@ class PinterestClient:
         response = self.client.post(ep, json=body)
         return response
 
+    def create_request_from_template(self, account_id, template_id, time_range):
+        ep = f'ad_accounts/{account_id}/templates/{template_id}/reports'
+        response = self.client.post(ep, json=time_range)
+        return response
+
+
     def read_report(self, account_id, token):
         """
         response:
