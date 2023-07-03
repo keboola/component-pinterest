@@ -73,12 +73,12 @@ class TimeRange:
 
 @dataclass
 class ReportSettings:
-    level: LevelEnum
-    columns: list[str]
-    click_window_days: str
-    engagement_window_days: str
-    view_window_days: str
-    conversion_report_time: ConversionReportTimeEnum
+    level: LevelEnum = "ADVERTISER"
+    columns: list[str] = field(default_factory=lambda: ConfigTree({}))
+    click_window_days: str = ""
+    engagement_window_days: str = ""
+    view_window_days: str = ""
+    conversion_report_time: ConversionReportTimeEnum = "TIME_OF_AD_ACTION"
 
 
 class ConfigurationBase:
