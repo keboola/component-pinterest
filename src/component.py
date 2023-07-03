@@ -11,6 +11,7 @@ import requests
 from keboola.component.base import ComponentBase, sync_action
 from keboola.component.exceptions import UserException
 from keboola.component.sync_actions import SelectElement
+from keboola.utils.header_normalizer import DefaultHeaderNormalizer
 import dateparser
 
 from Pinterest.client import PinterestClient
@@ -127,6 +128,10 @@ class Component(ComponentBase):
         keys, columns = self.check_output_files(started_reports)
         keys.insert(0, 'Account_ID')
         columns.insert(0, 'Account_ID')
+
+        normalizer = DefaultHeaderNormalizer()
+        columns = normalizer.normalize_header(columns)
+        keys = normalizer.normalize_header(keys)
 
         table = self.create_out_table_definition(self.cfg.destination.table_name,
                                                  incremental=self.cfg.destination.incremental_loading,
