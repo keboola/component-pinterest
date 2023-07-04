@@ -39,7 +39,16 @@ class Component(ComponentBase):
     def client(self):
         if not self._pinterest_client:
             api_token = self.configuration.parameters.get('#api_token')
-            self._pinterest_client = PinterestClient(api_token)
+            refresh_token = user = passwd = ''
+            if hasattr(self.configuration, "oauth_credentials"):
+                user = self.configuration.oauth_credentials.appKey
+                passwd = self.configuration.oauth_credentials.appSecret
+                refresh_token = self.configuration.oauth_credentials.data.get('refresh_token')
+                pass
+            self._pinterest_client = PinterestClient(token=api_token,
+                                                     refresh_token=refresh_token,
+                                                     user=user,
+                                                     passwd=passwd)
         return self._pinterest_client
 
     def _prepare_dates_from_to(self) -> tuple:

@@ -1,3 +1,4 @@
+from keboola.component import UserException
 from keboola.http_client import HttpClient
 
 # from pinterest.client import PinterestSDKClient
@@ -17,7 +18,26 @@ class PinterestClient:
     for all commulnication to pinterest API.
     """
 
-    def __init__(self, token: str):
+    def __init__(self, token: str = '', refresh_token: str = '', user: str = '', passwd: str = ''):
+        if not token:
+            if not refresh_token:
+                raise UserException('Neither token nor refresh token were available')
+            client = HttpClient(base_url=BASE_URL,
+                                default_http_header={'Content-Type': 'application/x-www-form-urlencoded'},
+                                auth=(user, passwd))
+            body = {
+                'grant_type': 'refresh_token',
+                'refresh_token': refresh_token,
+                'scope': 'ads:read'
+            }
+            response = client.post('oauth/token', data=body)
+            if not response.get('access_token'):
+                message = response.get('message')
+                if not message:
+                    message = str(response)
+                raise UserException(f'Error retrieving access token from refresh token: {message}')
+            token = response.get('message')
+
         AUTH_HEADER['Authorization'] = 'Bearer ' + token
         self.client = HttpClient(base_url=BASE_URL,
                                  default_http_header=DEFAULT_HEADER,
