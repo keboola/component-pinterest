@@ -36,7 +36,7 @@ class PinterestClient:
                 if not message:
                     message = str(response)
                 raise UserException(f'Error retrieving access token from refresh token: {message}')
-            token = response.get('message')
+            token = response.get('access_token')
 
         AUTH_HEADER['Authorization'] = 'Bearer ' + token
         self.client = HttpClient(base_url=BASE_URL,
