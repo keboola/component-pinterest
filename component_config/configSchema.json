@@ -1,12 +1,1 @@
-{
-  "type": "object",
-  "title": "Extractor configuration",
-  "properties": {
-    "#api_token": {
-        "type": "string",
-        "title": "API token",
-        "format": "password",
-        "propertyOrder": 1
-    }
-  }
-}
+{}
