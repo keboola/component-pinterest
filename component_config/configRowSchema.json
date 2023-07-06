@@ -52,12 +52,14 @@
         "date_from": {
           "type": "string",
           "title": "Date from",
+          "default":"7 days ago",
           "propertyOrder": 20,
           "description": "Start date: Either date in YYYY-MM-DD format or a relative date string i.e. 5 days ago, 1 month ago, yesterday, etc."
         },
         "date_to": {
           "type": "string",
           "title": "Date to",
+          "default":"today",
           "propertyOrder": 30,
           "description": "End date: Either date in YYYY-MM-DD format or a relative date string i.e. 5 days ago, 1 month ago, yesterday, etc."
         },
@@ -740,10 +742,10 @@
     },
     "existing_report_ids": {
       "type": "array",
-      "title": "Report ID(s) to be run in parallel",
+      "title": "Existing Custom Report Template(s)",
       "propertyOrder": 400,
       "minLength": 1,
-      "description": "Select report templates that will run in parallel",
+      "description": "Select custom report template(s) created in the Pinterest Ads Web interface. Optionally, more templates may be selected in case they exist across multiple AD accounts and share the same structure.",
       "format": "select",
       "uniqueItems": true,
       "items": {
