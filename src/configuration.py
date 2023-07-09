@@ -75,10 +75,20 @@ class TimeRange:
 class ReportSettings:
     level: LevelEnum = "ADVERTISER"
     columns: list[str] = field(default_factory=lambda: ConfigTree({}))
-    click_window_days: str = ""
-    engagement_window_days: str = ""
-    view_window_days: str = ""
+    conversion_window: str = "30/30/30"
     conversion_report_time: ConversionReportTimeEnum = "TIME_OF_AD_ACTION"
+
+    @property
+    def click_window_days(self):
+        return self.conversion_window.split('/')[0]
+
+    @property
+    def engagement_window_days(self):
+        return self.conversion_window.split('/')[1]
+
+    @property
+    def view_window_days(self):
+        return self.conversion_window.split('/')[2]
 
 
 class ConfigurationBase:
