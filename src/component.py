@@ -212,6 +212,48 @@ class Component(ComponentBase):
         ]
         return result
 
+    @sync_action('list_columns')
+    def list_columns(self):
+        account_id = None
+        accounts = self.configuration.parameters.get('accounts')
+        if accounts:
+            account_id = accounts[0]
+        if not account_id:
+            accounts = self.client.get_accounts()
+            if accounts:
+                account_id = accounts[0]['id']
+        if not account_id:
+            raise UserException('It was not possible to find usable account_id')
+
+        fake_body = {'start_date': '2023-01-01', 'end_date': '2023-01-31', 'granularity': 'DAY',
+                     'click_window_days': 30,
+                     'engagement_window_days': 30,
+                     'view_window_days': 30,
+                     'conversion_report_time': 'TIME_OF_AD_ACTION',
+                     'columns': ['NONSENSE_XXXXXX'],
+                     'level': 'CAMPAIGN',
+                     'report_format': 'CSV'}
+
+        try:
+            self.client.create_request(account_id=account_id, body=fake_body)
+        except UserException as ex:
+            key = "'NONSENSE_XXXXXX' is not one of ['"
+            s = str(ex)
+            start = s.find(key)
+            if start < 0:
+                raise ex
+            s = s[start+len(key):]
+            end = s.find("']")
+            s = s[:end]
+            result = [SelectElement(
+                value=item,
+                label=item)
+                for item in s.split("', '")
+            ]
+            return result
+
+        raise UserException('Failed to generate list of columns')
+
 
 """
         Main entrypoint

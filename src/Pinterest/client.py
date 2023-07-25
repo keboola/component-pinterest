@@ -1,8 +1,6 @@
 from keboola.component import UserException
 from keboola.http_client import HttpClient
 
-# from pinterest.client import PinterestSDKClient
-
 BASE_URL = 'https://api.pinterest.com/v5'
 DEFAULT_HEADER = {
     'Content-Type': 'application/json'
@@ -13,8 +11,7 @@ AUTH_HEADER = {
 
 
 class PinterestClient:
-    """
-    Instance of this class provieds a service object that is responsible
+    """ Instance of this class provides a service object that is responsible
     for all commulnication to pinterest API.
     """
 
