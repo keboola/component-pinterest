@@ -2,6 +2,7 @@
 Template Component main class.
 
 """
+import datetime
 import os
 import csv
 import logging
@@ -103,7 +104,8 @@ class Component(ComponentBase):
         if self.cfg.input_variant == 'report_specification':
             report_body = self._prepare_report_body()
             for account_id in self.cfg.accounts:
-                response = self.client.create_request(account_id=account_id, body=report_body)
+                response = self.client.create_request(account_id=account_id, body=report_body,
+                                                      table_name=self.cfg.destination.table_name)
                 started_reports.append(dict(key=account_id, account_id=account_id, token=response['token']))
                 pass
         else:
@@ -225,10 +227,12 @@ class Component(ComponentBase):
         if not account_id:
             raise UserException('It was not possible to find usable account_id')
 
-        fake_body = {'start_date': '2023-01-01', 'end_date': '2023-01-31', 'granularity': 'DAY',
-                     'click_window_days': 30,
-                     'engagement_window_days': 30,
-                     'view_window_days': 30,
+        start_date = (datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        end_date = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+        fake_body = {'start_date': start_date, 'end_date': end_date, 'granularity': 'DAY',
+                     'click_window_days': 7,
+                     'engagement_window_days': 7,
+                     'view_window_days': 7,
                      'conversion_report_time': 'TIME_OF_AD_ACTION',
                      'columns': ['NONSENSE_XXXXXX'],
                      'level': 'CAMPAIGN',

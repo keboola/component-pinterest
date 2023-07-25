@@ -1,5 +1,6 @@
 from keboola.component import UserException
 from keboola.http_client import HttpClient
+import re
 
 BASE_URL = 'https://api.pinterest.com/v5'
 DEFAULT_HEADER = {
@@ -40,11 +41,19 @@ class PinterestClient:
                                  default_http_header=DEFAULT_HEADER,
                                  auth_header=AUTH_HEADER)
 
-    def call_client_method(self, method, ep, description='', **kwargs):
+    def call_client_method(self, method, ep, description='', table_name='', **kwargs):
         response = self.client._request_raw(method, ep, **kwargs)
         if response:
             return response.json()
-        raise UserException(f'HTTP Error {response.status_code} in {description}: ep = {ep}: {response.text}')
+        msg_columns = re.search('Columns .* are not available.', response.text)
+        if msg_columns:
+            message = f'Failed to create report {table_name}: {msg_columns.group()} Some metric & dimension ' \
+                      f'combinations aren\'t supported. To create more complex reports it is recommended ' \
+                      f'to use Pinterest Custom reports directly in the Pinterest platform.'
+        else:
+            message = f'HTTP Error {response.status_code} in {description}: ep = {ep}: {response.text}'
+
+        raise UserException(message)
 
     def get_accounts(self):
         request_params = {'page_size': 50}
@@ -76,9 +85,10 @@ class PinterestClient:
                 break
         return total
 
-    def create_request(self, account_id, body):
+    def create_request(self, account_id, body, table_name=''):
         ep = f'ad_accounts/{account_id}/reports'
-        response = self.call_client_method('post', ep, json=body, description='creating a report request')
+        response = self.call_client_method('post', ep, json=body, description='creating a report request',
+                                           table_name=table_name)
         return response
 
     def create_request_from_template(self, account_id, template_id, time_range):
