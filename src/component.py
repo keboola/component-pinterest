@@ -2,21 +2,20 @@
 Template Component main class.
 
 """
-import datetime
-import os
 import csv
+import datetime
 import logging
+import os
 import time
 
+import dateparser
 import requests
 from keboola.component.base import ComponentBase, sync_action
 from keboola.component.exceptions import UserException
 from keboola.component.sync_actions import SelectElement
 from keboola.utils.header_normalizer import DefaultHeaderNormalizer
-import dateparser
 
 from Pinterest.client import PinterestClient
-
 from configuration import Configuration, retrieve_keys
 
 
@@ -33,8 +32,77 @@ class Component(ComponentBase):
 
     def __init__(self):
         super().__init__()
-        self.cfg: Configuration = None
-        self._pinterest_client: PinterestClient = None
+        self.cfg: Configuration
+        self._pinterest_client: PinterestClient
+
+    def run(self):
+        """
+        Main execution code
+        """
+        self.__init_configuration()
+
+        started_reports = []
+
+        if self.cfg.input_variant == 'report_specification':
+            report_body = self._prepare_report_body()
+            for account_id in self.cfg.accounts:
+                logging.info(f"Creating custom report {self.cfg.destination.table_name} in account {account_id}.")
+                response = self.client.create_request(account_id=account_id, body=report_body,
+                                                      table_name=self.cfg.destination.table_name)
+                started_reports.append(dict(key=account_id, account_id=account_id, token=response['token']))
+
+        else:
+            time_range_body = self._prepare_time_range_body()
+            for item in self.cfg.existing_report_ids:
+                account_id, template_id = item.split(':')
+                logging.info(f"Creating report from template {template_id} in account {account_id}.")
+
+                response = self.client.create_request_from_template(account_id=account_id,
+                                                                    template_id=template_id,
+                                                                    time_range=time_range_body)
+                started_reports.append(dict(key=template_id, account_id=account_id, token=response['token']))
+
+        reports_to_check = started_reports
+
+        while reports_to_check:
+            next_reports = []
+            for report in reports_to_check:
+                response = self.client.read_report(report['account_id'], report['token'])
+                status = response['report_status']
+                if status == 'IN_PROGRESS':
+                    next_reports.append(report)
+                    continue
+                if status == 'FINISHED':
+                    report_url = response['url']
+                    raw_output_file = self._local_file(report['key'])
+                    self._download_file(report_url, raw_output_file)
+            reports_to_check = next_reports
+            if reports_to_check:
+                time.sleep(10)
+
+        keys, columns = self.check_output_files(started_reports)
+        keys.insert(0, 'Account_ID')
+        columns.insert(0, 'Account_ID')
+
+        normalizer = DefaultHeaderNormalizer()
+        columns = normalizer.normalize_header(columns)
+        keys = normalizer.normalize_header(keys)
+
+        table = self.create_out_table_definition(self.cfg.destination.table_name,
+                                                 incremental=self.cfg.destination.incremental_loading,
+                                                 primary_key=keys,
+                                                 columns=columns)
+
+        out_table_path = table.full_path
+        os.makedirs(out_table_path, exist_ok=True)
+        logging.info("Extraction finished")
+
+        self.combine_output_files(out_table_path, started_reports)
+
+        self.write_manifest(table)
+
+    def __init_configuration(self):
+        self.cfg = Configuration.fromDict(parameters=self.configuration.parameters)
 
     @property
     def client(self):
@@ -90,72 +158,6 @@ class Component(ComponentBase):
     def _destination_file(out_directory: str, key: str) -> str:
         path = f'{out_directory}/{key}.csv'
         return path
-
-    def run(self):
-        """
-        Main execution code
-        """
-
-        params = self.configuration.parameters
-        self.cfg = Configuration.fromDict(parameters=params)
-
-        started_reports = []
-
-        if self.cfg.input_variant == 'report_specification':
-            report_body = self._prepare_report_body()
-            for account_id in self.cfg.accounts:
-                response = self.client.create_request(account_id=account_id, body=report_body,
-                                                      table_name=self.cfg.destination.table_name)
-                started_reports.append(dict(key=account_id, account_id=account_id, token=response['token']))
-                pass
-        else:
-            time_range_body = self._prepare_time_range_body()
-            for item in self.cfg.existing_report_ids:
-                account_id, template_id = item.split(':')
-                response = self.client.create_request_from_template(account_id=account_id,
-                                                                    template_id=template_id,
-                                                                    time_range=time_range_body)
-                started_reports.append(dict(key=template_id, account_id=account_id, token=response['token']))
-            pass
-
-        reports_to_check = started_reports
-
-        while reports_to_check:
-            next_reports = []
-            for report in reports_to_check:
-                response = self.client.read_report(report['account_id'], report['token'])
-                status = response['report_status']
-                if status == 'IN_PROGRESS':
-                    next_reports.append(report)
-                    continue
-                if status == 'FINISHED':
-                    report_url = response['url']
-                    raw_output_file = self._local_file(report['key'])
-                    self._download_file(report_url, raw_output_file)
-            reports_to_check = next_reports
-            if reports_to_check:
-                time.sleep(10)
-
-        keys, columns = self.check_output_files(started_reports)
-        keys.insert(0, 'Account_ID')
-        columns.insert(0, 'Account_ID')
-
-        normalizer = DefaultHeaderNormalizer()
-        columns = normalizer.normalize_header(columns)
-        keys = normalizer.normalize_header(keys)
-
-        table = self.create_out_table_definition(self.cfg.destination.table_name,
-                                                 incremental=self.cfg.destination.incremental_loading,
-                                                 primary_key=keys,
-                                                 columns=columns)
-
-        out_table_path = table.full_path
-        os.makedirs(out_table_path, exist_ok=True)
-        logging.info(out_table_path)
-
-        self.combine_output_files(out_table_path, started_reports)
-
-        self.write_manifest(table)
 
     def check_output_files(self, file_descriptors: list) -> tuple:
         header = None
@@ -227,7 +229,7 @@ class Component(ComponentBase):
         if not account_id:
             raise UserException('It was not possible to find usable account_id')
 
-        start_date = (datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        start_date = (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         end_date = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
         fake_body = {'start_date': start_date, 'end_date': end_date, 'granularity': 'DAY',
                      'click_window_days': 7,
@@ -246,7 +248,7 @@ class Component(ComponentBase):
             start = s.find(key)
             if start < 0:
                 raise ex
-            s = s[start+len(key):]
+            s = s[start + len(key):]
             end = s.find("']")
             s = s[:end]
             result = [SelectElement(
