@@ -22,23 +22,23 @@
       "uniqueItems": true,
       "options": {
         "async": {
-          "label": "Load avaiable accounts",
+          "label": "Load available accounts",
           "action": "load_accounts"
         }
       }
     },
     "input_variant": {
       "type": "string",
-      "title": "Specification variant",
+      "title": "Report Specification",
       "propertyOrder": 100,
-      "description": "You may choose to either define a report or to use existing report templates",
+      "description": "You may choose to either define a report or to use existing report template(s)",
       "enum": [
         "report_specification",
         "existing_report_ids"
       ],
       "options": {
         "enum_titles": [
-          "Report specification",
+          "Custom Report",
           "Existing report template ID(s)"
         ]
       },
@@ -95,7 +95,7 @@
         "columns": {
           "title": "Columns",
           "type": "array",
-          "description": "Select reported columns",
+          "description": "Select report columns",
           "format": "select",
           "uniqueItems": true,
           "items": {
@@ -106,7 +106,7 @@
           },
           "options": {
             "async": {
-              "label": "Load column IDs",
+              "label": "Load columns",
               "action": "list_columns"
             }
           },
@@ -234,14 +234,6 @@
           "propertyOrder": 30
         }
       }
-    },
-    "debug": {
-      "type": "boolean",
-      "propertyOrder": 700,
-      "title": "Debug",
-      "hidden": true,
-      "description": "When checked, logging will be more verbose",
-      "format": "checkbox"
     }
   }
 }
