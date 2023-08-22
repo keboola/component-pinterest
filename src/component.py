@@ -180,7 +180,6 @@ class Component(ComponentBase):
         return keys, header
 
     def combine_output_files(self, out_directory, file_descriptors: list):
-        # for key, file in out_files.items():
         for item in file_descriptors:
             key = item['key']
             account_id = item['account_id']
@@ -191,7 +190,6 @@ class Component(ComponentBase):
                 next(reader)  # skip header line
                 writer = csv.writer(out_file)
                 for row in reader:
-                    # TODO: Append account_id at the end of the row
                     row.insert(0, account_id)
                     writer.writerow(row)
             pass

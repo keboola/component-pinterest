@@ -13,7 +13,7 @@ AUTH_HEADER = {
 
 class PinterestClient:
     """ Instance of this class provides a service object that is responsible
-    for all commulnication to pinterest API.
+    for all communication to pinterest API.
     """
 
     def __init__(self, token: str = '', refresh_token: str = '', user: str = '', passwd: str = ''):
@@ -41,7 +41,7 @@ class PinterestClient:
                                  default_http_header=DEFAULT_HEADER,
                                  auth_header=AUTH_HEADER)
 
-    def call_client_method(self, method, ep, description='', table_name='', **kwargs):
+    def _call_client_method(self, method: str, ep: str, description: str = '', table_name: str = '', **kwargs):
         response = self.client._request_raw(method, ep, **kwargs)
         if response:
             return response.json()
@@ -55,12 +55,12 @@ class PinterestClient:
 
         raise UserException(message)
 
-    def get_accounts(self):
+    def get_accounts(self) -> list:
         request_params = {'page_size': 50}
         total = []
         while True:
             ep = 'ad_accounts'
-            response = self.call_client_method('get', ep, params=request_params, description='listing accounts')
+            response = self._call_client_method('get', ep, params=request_params, description='listing accounts')
             items = response.get('items')
             total.extend(items)
             bookmark = response.get('bookmark')
@@ -70,12 +70,12 @@ class PinterestClient:
                 break
         return total
 
-    def get_templates(self, account_id):
+    def get_templates(self, account_id: str) -> list:
         request_params = {'page_size': 50, 'order': 'DESCENDING'}
         ep = f'ad_accounts/{account_id}/templates'
         total = []
         while True:
-            response = self.call_client_method('get', ep, params=request_params, description='listing templates')
+            response = self._call_client_method('get', ep, params=request_params, description='listing templates')
             items = response.get('items')
             total.extend(items)
             bookmark = response.get('bookmark')
@@ -85,25 +85,25 @@ class PinterestClient:
                 break
         return total
 
-    def create_request(self, account_id, body, table_name=''):
+    def create_request(self, account_id: str, body: dict, table_name=''):
         ep = f'ad_accounts/{account_id}/reports'
-        response = self.call_client_method('post', ep, json=body, description='creating a report request',
-                                           table_name=table_name)
+        response = self._call_client_method('post', ep, json=body, description='creating a report request',
+                                            table_name=table_name)
         return response
 
-    def create_request_from_template(self, account_id, template_id, time_range):
+    def create_request_from_template(self, account_id: str, template_id: str, time_range):
         ep = f'ad_accounts/{account_id}/templates/{template_id}/reports'
-        response = self.call_client_method('post', ep, json=time_range,
-                                           description='creating a report request using a template')
+        response = self._call_client_method('post', ep, json=time_range,
+                                            description='creating a report request using a template')
         return response
 
-    def read_report(self, account_id, token):
+    def read_report(self, account_id: str, token: str):
         """
         response:
             report_status: 'FINISHED' | ...
-            url: 'https://pinterest......' odkaz odkud se nacte obsah reportu
+            url: 'https://pinterest......' URL of resulting report
         """
         ep = f'ad_accounts/{account_id}/reports'
         request_params = {'token': token}
-        response = self.call_client_method('get', ep, params=request_params, description='reading report status')
+        response = self._call_client_method('get', ep, params=request_params, description='reading report status')
         return response

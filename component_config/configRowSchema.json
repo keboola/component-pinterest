@@ -12,6 +12,7 @@
       "title": "Accounts",
       "propertyOrder": 50,
       "description": "Select accounts to be reported",
+      "minItems": 1,
       "items": {
         "type": "string",
         "enum": [],
@@ -98,6 +99,7 @@
           "description": "Select report columns",
           "format": "select",
           "uniqueItems": true,
+          "minItems": 1,
           "items": {
             "title": "Column ID",
             "type": "string",
@@ -184,6 +186,7 @@
       "description": "Select custom report template(s) created in the Pinterest Ads Web interface. Optionally, more templates may be selected in case they exist across multiple AD accounts and share the same structure.",
       "format": "select",
       "uniqueItems": true,
+      "minItems": 1,
       "items": {
         "title": "Report ID",
         "type": "string",
