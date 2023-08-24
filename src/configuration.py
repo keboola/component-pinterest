@@ -18,6 +18,14 @@ _keys = {
 
 
 def retrieve_keys(column_list: list):
+    """Select keys out of a list of columns
+
+    Args:
+        column_list: List of column names
+
+    Returns:
+        List of columns that belong to primary key set (dimensions)
+    """
     keys = [item for item in column_list if item in _keys]
     return keys
 
