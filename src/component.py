@@ -55,7 +55,7 @@ class Component(ComponentBase):
             raise UserException('No accounts for reporting specified')
         if self.cfg.input_variant == "report_specification" and not self.cfg.report_specification.columns:
             raise UserException('No columns selected in report specification')
-        if self.cfg.input_variant == "existing_report_ids" and not self.existing_report_ids:
+        if self.cfg.input_variant == "existing_report_ids" and not self.cfg.existing_report_ids:
             raise UserException('No report IDs specified')
 
         started_reports = []
