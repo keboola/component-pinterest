@@ -53,7 +53,7 @@ class Component(ComponentBase):
         # Validate configuration
         if not self.cfg.accounts:
             raise UserException('No accounts for reporting specified')
-        if self.cfg.input_variant == "report_specification" and not self.report_specification.columns:
+        if self.cfg.input_variant == "report_specification" and not self.cfg.report_specification.columns:
             raise UserException('No columns selected in report specification')
         if self.cfg.input_variant == "existing_report_ids" and not self.existing_report_ids:
             raise UserException('No report IDs specified')
