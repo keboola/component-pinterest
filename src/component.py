@@ -126,6 +126,9 @@ class Component(ComponentBase):
         Authorization will use '#api_token' parameter if provided.
         Else oauth credentials will be used.
         """
+        if not self.configuration.oauth_credentials:
+            raise UserException(
+                "The authorization is not set up. Please authorize the configuration with your Pinterest account first")
         if not self._pinterest_client:
             api_token = self.configuration.parameters.get('#api_token')
             refresh_token = user = passwd = ''
