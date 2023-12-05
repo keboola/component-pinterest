@@ -118,6 +118,11 @@ class Component(ComponentBase):
         self.write_manifest(table)
 
     def __init_configuration(self):
+        try:
+            self._validate_parameters(self.configuration.parameters, Configuration.get_dataclass_required_parameters(),
+                                      'Row')
+        except UserException as e:
+            raise UserException(f"{e} The configuration is invalid. Please check that you added a configuration row.")
         self.cfg = Configuration.fromDict(parameters=self.configuration.parameters)
 
     @property
