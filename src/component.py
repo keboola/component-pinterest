@@ -50,6 +50,8 @@ class Component(ComponentBase):
         """
         self.__init_configuration()
 
+        logging.info("Starting extraction v 2.0.0")
+
         # Validate configuration
         if not self.cfg.accounts:
             raise UserException('No accounts for reporting specified')
@@ -281,6 +283,8 @@ class Component(ComponentBase):
         if not account_id:
             raise UserException('It was not possible to find usable account_id')
 
+        level = self.configuration.parameters.get('report_specification', {}).get('level', '')
+
         start_date = (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         end_date = (datetime.date.today() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
         fake_body = {'start_date': start_date, 'end_date': end_date, 'granularity': 'DAY',
@@ -289,7 +293,7 @@ class Component(ComponentBase):
                      'view_window_days': 7,
                      'conversion_report_time': 'TIME_OF_AD_ACTION',
                      'columns': ['NONSENSE_XXXXXX'],
-                     'level': 'CAMPAIGN',
+                     'level': level,
                      'report_format': 'CSV'}
 
         try:
@@ -303,11 +307,21 @@ class Component(ComponentBase):
             s = s[start + len(key):]
             end = s.find("']")
             s = s[:end]
-            result = [SelectElement(
-                value=item,
-                label=item)
-                for item in s.split("', '")
-            ]
+
+            all_items = s.split("', '")
+            to_remove = ['OUTBOUND_CTR', 'COST_PER_OUTBOUND_CLICK', 'EENGAGEMENT_RATE',
+                         'ADVERTISER_ID', 'AD_ID', 'PAID_IMPRESSION', 'AD_NAME', 'AD_ACCOUNT_ID']
+
+            if level in ('CAMPAIGN_TARGETING', 'AD_GROUP_TARGETING', 'PIN_PROMOTION_TARGETING',
+                         'PRODUCT_GROUP_TARGETING', 'KEYWORD'):
+                to_remove.extend(['TOTAL_IMPRESSION_USER', 'TOTAL_IMPRESSION_FREQUENCY'])
+
+            if level == 'PRODUCT_GROUP_TARGETING':
+                to_remove.extend(['OUTBOUND_CTR', 'COST_PER_OUTBOUND_CLICK'])
+
+            items = [item for item in all_items if item not in to_remove]
+
+            result = [SelectElement(value=item, label=item) for item in items]
             return result
 
         raise UserException('Failed to generate list of columns')
