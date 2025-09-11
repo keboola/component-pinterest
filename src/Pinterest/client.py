@@ -186,6 +186,8 @@ class PinterestClient:
         ep = f'ad_accounts/{account_id}/templates/{template_id}/reports'
         response = self._call_client_method('post', ep, json=time_range,
                                             description='creating a report request using a template')
+        import logging
+        logging.info(str(time_range))
         return response
 
     def get_report_status(self, account_id: str, token: str):
