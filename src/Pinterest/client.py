@@ -184,7 +184,7 @@ class PinterestClient:
             UserException: If error occurred - either specification problem or communication problem
         """
         ep = f'ad_accounts/{account_id}/templates/{template_id}/reports'
-        response = self._call_client_method('post', ep, json=time_range,
+        response = self._call_client_method('post', ep, params=time_range,
                                             description='creating a report request using a template')
         return response
 
