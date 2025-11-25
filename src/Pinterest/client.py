@@ -52,7 +52,8 @@ class PinterestClient:
         AUTH_HEADER['Authorization'] = 'Bearer ' + token
         self.client = HttpClient(base_url=BASE_URL,
                                  default_http_header=DEFAULT_HEADER,
-                                 auth_header=AUTH_HEADER)
+                                 auth_header=AUTH_HEADER,
+                                 status_forcelist=(502, 504))
 
     def _call_client_method(self, method: str, ep: str, description: str = '', table_name: str = '', **kwargs):
         """This is a wrapper around request method provided by the HttpClient.
