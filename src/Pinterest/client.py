@@ -61,7 +61,7 @@ class PinterestClient:
         """This is a wrapper around request method provided by the HttpClient.
         Its purpose is to filter our specifically problem of incompatible selected columns.
         If method fails it is converted to UserException exception with more elaborated error message.
-        
+
         For HTTP 500 errors, implements retry logic with exponential backoff to handle transient issues.
 
         Args:
@@ -79,20 +79,20 @@ class PinterestClient:
         """
         max_attempts = 3
         backoff_seconds = 2
-        
+
         for attempt in range(1, max_attempts + 1):
             response = self.client._request_raw(method, ep, **kwargs)
-            
+
             if response:
                 return response.json()
-            
+
             msg_columns = re.search('Columns .* are not available.', response.text)
             if msg_columns:
                 message = f'Failed to create report {table_name}: {msg_columns.group()} Some metric & dimension ' \
                           f'combinations aren\'t supported. To create more complex reports it is recommended ' \
                           f'to use Pinterest Custom reports directly in the Pinterest platform.'
                 raise UserException(message)
-            
+
             if response.status_code == 500 and attempt < max_attempts:
                 logging.warning(
                     f'Pinterest API returned HTTP 500 for {ep} (attempt {attempt}/{max_attempts}): {response.text}'
@@ -100,7 +100,7 @@ class PinterestClient:
                 time.sleep(backoff_seconds)
                 backoff_seconds *= 2
                 continue
-            
+
             message = f'HTTP Error {response.status_code} in {description}: ep = {ep}: {response.text}'
             raise UserException(message)
 
