@@ -151,8 +151,24 @@ class Component(ComponentBase):
         return self._pinterest_client
 
     def _prepare_dates_from_to(self) -> tuple:
-        date_from = dateparser.parse(self.cfg.time_range.date_from)
-        date_to = dateparser.parse(self.cfg.time_range.date_to)
+        date_from_str = getattr(self.cfg.time_range, 'date_from', None)
+        date_to_str = getattr(self.cfg.time_range, 'date_to', None)
+
+        if not date_from_str or not date_to_str:
+            raise UserException(
+                "Time range is not configured. Please fill in both 'From' and 'To' dates in the configuration."
+            )
+
+        date_from = dateparser.parse(date_from_str)
+        date_to = dateparser.parse(date_to_str)
+
+        if not date_from or not date_to:
+            raise UserException(
+                f"Invalid date format in time range. "
+                f"date_from='{date_from_str}', date_to='{date_to_str}'. "
+                "Use values like '7 days ago', 'today', or 'YYYY-MM-DD'."
+            )
+
         return date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d")
 
     def _prepare_report_body(self):
