@@ -53,7 +53,7 @@
         "date_from": {
           "type": "string",
           "title": "Date from",
-          "default": "7 days ago",
+          "default": "3 days ago",
           "propertyOrder": 20,
           "description": "Start date: Either date in YYYY-MM-DD format or a relative date string i.e. 5 days ago, 1 month ago, yesterday, etc."
         },
