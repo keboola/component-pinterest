@@ -136,3 +136,4 @@ class Configuration(ConfigurationBase):
     report_specification: ReportSettings = field(default_factory=lambda: ConfigTree({}))
     existing_report_ids: list[str] = field(default_factory=lambda: ConfigTree({}))
     debug: bool = False
+    enable_advertiser_columns: bool = False

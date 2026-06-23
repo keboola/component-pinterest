@@ -310,7 +310,10 @@ class Component(ComponentBase):
 
             all_items = s.split("', '")
             to_remove = ['OUTBOUND_CTR', 'COST_PER_OUTBOUND_CLICK', 'EENGAGEMENT_RATE',
-                         'ADVERTISER_ID', 'AD_ID', 'PAID_IMPRESSION', 'AD_NAME', 'AD_ACCOUNT_ID']
+                         'AD_ID', 'PAID_IMPRESSION', 'AD_NAME']
+            enable_advertiser_columns = self.configuration.parameters.get('enable_advertiser_columns', False)
+            if not enable_advertiser_columns:
+                to_remove.extend(['ADVERTISER_ID', 'AD_ACCOUNT_ID'])
 
             if level in ('CAMPAIGN_TARGETING', 'AD_GROUP_TARGETING', 'PIN_PROMOTION_TARGETING',
                          'PRODUCT_GROUP_TARGETING', 'KEYWORD'):
